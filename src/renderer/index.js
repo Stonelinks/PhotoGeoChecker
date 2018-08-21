@@ -4,15 +4,16 @@ import ReactDOM from "react-dom"
 import Dropzone from "react-dropzone"
 import { Map, TileLayer, Marker, Popup } from "react-leaflet"
 
+import bbox from "@turf/bbox"
 import MDSpinner from "react-md-spinner"
 
+import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 
-import bbox from "@turf/bbox"
+import { parseFile } from "./parser"
 
 // fix default marker bug
 // see https://github.com/PaulLeCam/react-leaflet/issues/255
-import L from "leaflet"
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -20,7 +21,15 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png")
 })
 
-import { parseFile } from "./parser"
+const styles = {
+  title: { display: "inline-block", marginRight: "10px" },
+  inline: { display: "inline-block", marginLeft: "10px", marginRight: "10px" },
+  dropzone: {
+    borderRadius: "10px",
+    border: "1px dashed black",
+    padding: "10px"
+  }
+}
 
 const STATUS = {
   NO_FILES: "no_files",
@@ -50,7 +59,7 @@ const DEFAULT_VIEWPORT = {
 
 const DEFAULT_STATE = {
   status: STATUS.NO_FILES,
-  parsed: [],
+  parsed: null,
   viewport: DEFAULT_VIEWPORT
 }
 class App extends React.Component {
@@ -67,34 +76,35 @@ class App extends React.Component {
   }
 
   onAcceptFiles(files) {
-    let { parsed } = this.state
+    const { parsed } = this.state
     if (files && files.length) {
-      this.setState(
-        {
-          status: STATUS.LOADING
-        },
-        async () => {
-          for (var i = 0; i < files.length; i++) {
-            const p = await parseFile(files[i])
-            p.name = files[i].name
-            parsed.push(p)
-          }
+      this.setState({ status: STATUS.LOADING }, async () => {
+        let newParsed = []
+        if (parsed && parsed.length) {
+          newParsed = newParsed.concat(parsed)
+        }
 
+        for (var i = 0; i < files.length; i++) {
+          const p = await parseFile(files[i])
+          p.name = files[i].name
+          newParsed.push(p)
+        }
+
+        if (newParsed.length) {
           this.setState({
             status: STATUS.HAS_FILES,
-            parsed
+            parsed: newParsed
           })
 
           this.fitMapToBounds()
         }
-      )
+      })
     }
   }
 
   fitMapToBounds() {
-    if (this.mapRef) {
-      const { parsed } = this.state
-
+    const { parsed } = this.state
+    if (this.mapRef && parsed && parsed.length) {
       const turfBounds = bbox({
         type: "FeatureCollection",
         features: parsed.map(p => {
@@ -126,56 +136,75 @@ class App extends React.Component {
     const { status, parsed, viewport } = this.state
 
     let parsedMarkers = []
-    for (let i = 0; i < parsed.length; i++) {
-      const p = parsed[i]
-      const coords = p.coordinates.coordinates
-      parsedMarkers.push(
-        <Marker key={i} position={[coords[1], coords[0]]}>
-          <Popup>
-            <div>
-              <b>{p.name}</b>
-              <p>{p.coordinates.coordinates}</p>
-            </div>
-          </Popup>
-        </Marker>
-      )
+    if (parsed && parsed.length) {
+      for (let i = 0; i < parsed.length; i++) {
+        const p = parsed[i]
+        if (
+          p.coordinates &&
+          p.coordinates.coordinates &&
+          p.coordinates.coordinates.length
+        ) {
+          const coords = p.coordinates.coordinates
+          parsedMarkers.push(
+            <Marker key={i} position={[coords[1], coords[0]]}>
+              <Popup>
+                <div>
+                  <div>
+                    <b style={styles.inline}>Name:</b>
+                    <div style={styles.inline}>{p.name}</div>
+                  </div>
+                  <div>
+                    <b style={styles.inline}>Lat:</b>
+                    <div style={styles.inline}>{coords[1]}</div>
+                  </div>
+                  <div>
+                    <b style={styles.inline}>Lng:</b>
+                    <div style={styles.inline}>{coords[0]}</div>
+                  </div>
+                  <div>
+                    <b style={styles.inline}>Type:</b>
+                    <div style={styles.inline}>{p.category}</div>
+                  </div>
+                </div>
+              </Popup>
+            </Marker>
+          )
+        }
+      }
+    } else {
+      parsedMarkers = null
     }
 
     return (
       <div>
-        <h1>
-          {status === STATUS.NO_FILES && "No files"}
+        <h2 style={styles.title}>
+          {status === STATUS.NO_FILES && `No files`}
           {status === STATUS.LOADING && `Loading`}
-          {status === STATUS.HAS_FILES && `Displaying ${parsed.length} files`}
+          {status === STATUS.HAS_FILES && `Displaying ${parsed.length} images`}
           {status === STATUS.LOADING && (
-            <div style={{ display: "inline-block", marginLeft: "10px" }}>
+            <div style={styles.inline}>
               <MDSpinner />
             </div>
           )}
           {status === STATUS.HAS_FILES && (
-            <button
-              onClick={this.onCancel}
-              style={{ display: "inline-block", marginLeft: "10px" }}
-            >
+            <button onClick={this.onCancel} style={styles.inline}>
               Reset
             </button>
           )}
-        </h1>
+        </h2>
         <Dropzone
           disableClick
           accept={ALL_MIMETYPES.join(", ")}
           onDrop={this.onAcceptFiles}
-          style={{
-            borderRadius: "10px",
-            border: "1px dashed black",
-            padding: "10px"
-          }}
+          style={styles.dropzone}
         >
-          <p>Try dragging some files here.</p>
-          <p>{`${ALL_EXTENSIONS.join(", ")}`} files are accepted</p>
+          <p>
+            Try dragging some images here. {`${ALL_EXTENSIONS.join(", ")}`}{" "}
+            files are accepted.
+          </p>
           <Map
             ref={this.onMapRef}
-            style={{ width: "100%", height: "calc(100vh - 195px)" }}
+            style={{ width: "100%", height: "calc(100vh - 155px)" }}
             onViewportChanged={this.onViewportChanged}
             viewport={viewport}
           >

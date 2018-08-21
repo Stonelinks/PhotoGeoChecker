@@ -1,15 +1,6 @@
 # PhotoGeoChecker
 
-> A bare minimum project structure to get started developing with [`electron-webpack`](https://github.com/Stonelinks/electron-webpack).
-
-Thanks to the power of `electron-webpack` this template comes packed with...
-
-* Use of [`webpack-dev-server`](https://github.com/webpack/webpack-dev-server) for development
-* HMR for both `renderer` and `main` processes
-* Use of [`babel-preset-env`](https://github.com/babel/babel-preset-env) that is automatically configured based on your `electron` version
-* Use of [`electron-builder`](https://github.com/Stonelinks/electron-builder) to package and build a distributable electron application
-
-Make sure to check out [`electron-webpack`'s documentation](https://webpack.electron.build/) for more details.
+> A small desktop application for checking where images were taken on a map
 
 ### Development Scripts
 
