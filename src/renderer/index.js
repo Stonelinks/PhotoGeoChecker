@@ -1,9 +1,10 @@
-import _ from "underscore"
+import _ from "lodash"
 import React from "react"
 import ReactDOM from "react-dom"
 import Dropzone from "react-dropzone"
 import { Map, TileLayer, Marker, Popup } from "react-leaflet"
-import Spinner from "react-spinkit"
+
+import MDSpinner from "react-md-spinner"
 
 import "leaflet/dist/leaflet.css"
 
@@ -23,6 +24,7 @@ import { parseFile } from "./parser"
 
 const STATUS = {
   NO_FILES: "no_files",
+  LOADING: "loading",
   HAS_FILES: "has_files"
 }
 
@@ -49,7 +51,6 @@ const DEFAULT_VIEWPORT = {
 const DEFAULT_STATE = {
   status: STATUS.NO_FILES,
   parsed: [],
-  isLoading: false,
   viewport: DEFAULT_VIEWPORT
 }
 class App extends React.Component {
@@ -70,7 +71,7 @@ class App extends React.Component {
     if (files && files.length) {
       this.setState(
         {
-          isLoading: true
+          status: STATUS.LOADING
         },
         async () => {
           for (var i = 0; i < files.length; i++) {
@@ -81,8 +82,7 @@ class App extends React.Component {
 
           this.setState({
             status: STATUS.HAS_FILES,
-            parsed,
-            isLoading: false
+            parsed
           })
 
           this.fitMapToBounds()
@@ -123,34 +123,33 @@ class App extends React.Component {
   }
 
   render() {
-    const { status, parsed, viewport, isLoading } = this.state
+    const { status, parsed, viewport } = this.state
 
     let parsedMarkers = []
-    if (status === STATUS.HAS_FILES) {
-      for (let i = 0; i < parsed.length; i++) {
-        const p = parsed[i]
-        const coords = p.coordinates.coordinates
-        parsedMarkers.push(
-          <Marker key={i} position={[coords[1], coords[0]]}>
-            <Popup>
-              <div>
-                <b>{p.name}</b>
-                <p>{p.coordinates.coordinates}</p>
-              </div>
-            </Popup>
-          </Marker>
-        )
-      }
+    for (let i = 0; i < parsed.length; i++) {
+      const p = parsed[i]
+      const coords = p.coordinates.coordinates
+      parsedMarkers.push(
+        <Marker key={i} position={[coords[1], coords[0]]}>
+          <Popup>
+            <div>
+              <b>{p.name}</b>
+              <p>{p.coordinates.coordinates}</p>
+            </div>
+          </Popup>
+        </Marker>
+      )
     }
 
     return (
       <div>
         <h1>
           {status === STATUS.NO_FILES && "No files"}
+          {status === STATUS.LOADING && `Loading`}
           {status === STATUS.HAS_FILES && `Displaying ${parsed.length} files`}
-          {isLoading && (
+          {status === STATUS.LOADING && (
             <div style={{ display: "inline-block", marginLeft: "10px" }}>
-              <Spinner name="circle" />
+              <MDSpinner />
             </div>
           )}
           {status === STATUS.HAS_FILES && (
@@ -176,7 +175,7 @@ class App extends React.Component {
           <p>{`${ALL_EXTENSIONS.join(", ")}`} files are accepted</p>
           <Map
             ref={this.onMapRef}
-            style={{ width: "100%", height: "calc(100vh - 210px)" }}
+            style={{ width: "100%", height: "calc(100vh - 195px)" }}
             onViewportChanged={this.onViewportChanged}
             viewport={viewport}
           >
