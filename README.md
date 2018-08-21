@@ -1,4 +1,5 @@
 # PhotoGeoChecker
+
 > A bare minimum project structure to get started developing with [`electron-webpack`](https://github.com/Stonelinks/electron-webpack).
 
 Thanks to the power of `electron-webpack` this template comes packed with...
@@ -10,28 +11,14 @@ Thanks to the power of `electron-webpack` this template comes packed with...
 
 Make sure to check out [`electron-webpack`'s documentation](https://webpack.electron.build/) for more details.
 
-## Getting Started
-Simply clone down this reposity, install dependencies, and get started on your application.
+### Development Scripts
 
 The use of the [yarn](https://yarnpkg.com/) package manager is **strongly** recommended, as opposed to using `npm`.
 
 ```bash
-# create a directory of your choice, and copy template using curl
-mkdir new-electron-webpack-project && cd new-electron-webpack-project
-curl -fsSL https://github.com/Stonelinks/PhotoGeoChecker/archive/master.tar.gz | tar -xz --strip-components 1
-
-# or copy template using git clone
-git clone https://github.com/Stonelinks/PhotoGeoChecker.git
-cd PhotoGeoChecker
-rm -rf .git
-
 # install dependencies
 yarn
-```
 
-### Development Scripts
-
-```bash
 # run application in development mode
 yarn dev
 

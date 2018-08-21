@@ -6,14 +6,12 @@
     "dev": "electron-webpack dev",
     "compile": "electron-webpack",
     "dist": "yarn compile && electron-builder",
-    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null"
+    "dist:dir": "yarn dist --dir -c.compression=store -c.mac.identity=null",
+    "lint": "prettier --write --no-semi ./src/**/*.js"
   },
   "electronWebpack": {
     "renderer": {
       "webpackConfig": "webpack.renderer.config.js"
-    },
-    "main": {
-      "webpackConfig": "webpack.main.config.js"
     }
   },
   "dependencies": {
@@ -26,8 +24,10 @@
     "react-dom": "^16.4.2",
     "react-dropzone": "^5.0.1",
     "react-leaflet": "^2.0.1",
+    "react-spinkit": "^3.0.0",
     "sax": "^1.2.4",
     "source-map-support": "^0.5.5",
+    "underscore": "^1.9.1",
     "utif": "^2.0.0"
   },
   "devDependencies": {
@@ -35,7 +35,7 @@
     "electron": "2.0.0",
     "electron-builder": "^20.11.1",
     "electron-webpack": "^2.1.2",
-    "file-loader": "^1.1.11",
+    "prettier": "^1.14.2",
     "webpack": "^4.8.1"
   },
   "resolutions": {

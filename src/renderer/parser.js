@@ -10,7 +10,7 @@ export const FileCategory = {
   RGB_45MM_IMAGE: "rgb_45mm_image",
   RGB_OBLIQUE_IMAGE: "rgb_oblique_image",
   THERMAL_IMAGE: "thermal_image",
-  LAYER: "layer",
+  LAYER: "layer"
 }
 
 const MAX_FILE_READ_SIZE = 1000000
@@ -29,7 +29,7 @@ export async function parseFile(file) {
 async function parseBuffer(buffer, mimetype) {
   const data = {
     category: null,
-    isGeoTIFF: false,
+    isGeoTIFF: false
   }
 
   try {
@@ -97,7 +97,7 @@ function exifCoordinates(exifResult) {
   if (tags.GPSLatitude && tags.GPSLongitude) {
     return {
       type: "Point",
-      coordinates: [tags.GPSLongitude, tags.GPSLatitude],
+      coordinates: [tags.GPSLongitude, tags.GPSLatitude]
     }
   }
   return null
@@ -109,7 +109,7 @@ function tiffCoordinates(gpsTags) {
   if (lat !== undefined && long !== undefined) {
     return {
       type: "Point",
-      coordinates: [long, lat],
+      coordinates: [long, lat]
     }
   }
   return null

@@ -16,13 +16,13 @@ const envelopeTags = [
   "rdf:Alt",
   "rdf:Seq",
   "rdf:li",
-  "mwg-rs:RegionList",
+  "mwg-rs:RegionList"
 ]
 
 export function parseXMP(buffer) {
   return new Promise((resolve, reject) => {
     let data = {
-      raw: {},
+      raw: {}
     }
     const xmpString = getXMPString(buffer)
     if (!xmpString) {
