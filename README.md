@@ -1,6 +1,6 @@
 # PhotoGeoChecker
 
-> A small desktop application for checking where images were taken on a map
+> A small desktop application to check where images were taken on a map
 
 ![demo](https://github.com/Stonelinks/PhotoGeoChecker/raw/master/demo.gif)
 
